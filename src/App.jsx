@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
@@ -10,7 +10,14 @@ import MessageSection from './components/MessageSection';
 import MusicPlayer from './components/MusicPlayer';
 
 function App() {
+  const musicPlayerRef = useRef(null);
+
   const triggerConfetti = () => {
+    // Play music if available
+    if (musicPlayerRef.current) {
+      musicPlayerRef.current.play();
+    }
+
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
@@ -39,7 +46,7 @@ function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden font-sans selection:bg-pink-200">
       <FloatingBackground />
-      <MusicPlayer />
+      <MusicPlayer ref={musicPlayerRef} />
 
       <main className="relative z-10 w-full">
         <Hero />

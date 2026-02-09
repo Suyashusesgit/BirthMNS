@@ -1,19 +1,42 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useImperativeHandle, forwardRef, useEffect } from 'react';
 import { Music, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const MusicPlayer = () => {
+const MusicPlayer = forwardRef((props, ref) => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const audioRef = useRef(new Audio('/aud.mp3')); // Happy Birthday Song
-    audioRef.current.preload = 'auto';
+    const audioRef = useRef(null);
+
+    useEffect(() => {
+        audioRef.current = new Audio('/aud.mp3');
+        audioRef.current.preload = 'auto';
+        audioRef.current.loop = true;
+
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+        play: () => {
+            if (audioRef.current && !isPlaying) {
+                audioRef.current.play().catch(e => console.log("Audio play failed", e));
+                setIsPlaying(true);
+            }
+        }
+    }));
 
     const togglePlay = () => {
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play().catch(e => console.log("Audio play failed", e));
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play().catch(e => console.log("Audio play failed", e));
+            }
+            setIsPlaying(!isPlaying);
         }
-        setIsPlaying(!isPlaying);
     };
 
     return (
@@ -26,6 +49,8 @@ const MusicPlayer = () => {
             {isPlaying ? <Pause className="w-6 h-6" /> : <Music className="w-6 h-6" />}
         </motion.button>
     );
-};
+});
+
+MusicPlayer.displayName = 'MusicPlayer';
 
 export default MusicPlayer;

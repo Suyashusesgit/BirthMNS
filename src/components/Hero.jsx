@@ -8,7 +8,7 @@ const Hero = () => {
     function calculateTimeLeft() {
         // Set birthday date to tomorrow (Feb 10th)
         const year = new Date().getFullYear();
-        const birthday = new Date(`${year}-02-10`);
+        const birthday = new Date(year, 1, 10);
         const now = new Date();
 
         if (now > birthday) {
